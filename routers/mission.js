@@ -6,14 +6,9 @@ var missionRouter = express.Router();
 missionRouter
   .route('/missions')
   .post(function (request, response) {
-
     console.log('POST /missions');
 
     var mission = new Mission(request.body);
-
-    console.log('request.body :' + JSON.stringify(request.body));
-    console.log('mission :' + mission);
-
     mission.save(function(error, mission) {
       if (error) {
         response.status(500).send(error);
@@ -24,18 +19,13 @@ missionRouter
     });
   })
   .get(function (request, response) {
-
     console.log('GET /missions');
 
     Mission.find(function (error, missions) {
-
       if (error) {
         response.status(500).send(error);
         return;
       }
-
-      console.log(missions);
-
       response.json(missions);
     });
   });
@@ -43,36 +33,23 @@ missionRouter
 missionRouter
   .route('/missions/:id')
   .get(function (request, response) {
-
     console.log('GET /missions/:id');
 
     var missionId = request.params.id;
-
-    console.log("missionId: " + missionId);
-
     Mission.findOne({ _id: missionId }, function (error, mission) {
-
       if (error) {
         response.status(500).send(error);
         return;
       }
 
-      console.log(mission);
-
       response.json(mission);
-
     });
   })
   .put(function (request, response) {
-
     console.log('PUT /missions/:id');
 
     var missionId = request.params.id;
-
     Mission.findOne({ _id: missionId }, function (error, mission) {
-
-      console.log('mission :' + JSON.stringify(mission));
-
       if (error) {
         response.status(500).send(error);
         return;
@@ -99,20 +76,16 @@ missionRouter
     });
   })
   .patch(function (request, response) {
-
     console.log('PATCH /missions/:id');
 
     var missionId = request.params.id;
-
     Mission.findOne({ _id: missionId }, function (error, mission) {
-
       if (error) {
         response.status(500).send(error);
         return;
       }
 
       if (mission) {
-
         for (var property in request.body) {
           if (request.body.hasOwnProperty(property)) {
             if (typeof mission[property] !== 'undefined') {
@@ -133,10 +106,15 @@ missionRouter
         //   mission.quantity = request.body.quantity;
         // }
 
-        mission.save();
-
-        response.json(mission);
-        return;
+        mission.save(function(error, mission) {
+          if (error) {
+            response.status(500).send(error);
+            return;
+          } else {
+            response.json(mission);
+            return;
+          }
+        });
       }
 
       response.status(404).json({
@@ -145,13 +123,10 @@ missionRouter
     });
   })
   .delete(function (request, response) {
-
     console.log('DELETE /missions/:id');
 
     var missionId = request.params.id;
-
     Mission.findOne({ _id: missionId }, function (error, mission) {
-
       if (error) {
         response.status(500).send(error);
         return;
